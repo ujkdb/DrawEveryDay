@@ -6,3 +6,19 @@ header {
 footer {
 	font-family: Raleway;
 }
+
+.gallery-rows {
+    display: flex;
+    flex-direction: column;
+}
+
+.gallery-row {
+    display: flex;
+    justify-content: center;
+}
+
+.miniature {
+    margin: 1em;
+    width: 15em;
+    height: 15em;
+}

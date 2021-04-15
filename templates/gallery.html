@@ -1,0 +1,22 @@
+{% extends base.html %}
+
+{% set order=0 %}
+
+{% block title %}Галерея картинок{% endblock %}
+
+{% block content %}
+<div class="gallery-rows">
+    {% for path in files %}
+    {% if order == 0 %}
+    <div class="gallery-row">
+    {% endif %}
+        <img class="miniature rounded-3 border" src="{{ path }}">
+    {% if order == 2%}
+    </div>
+    {% set order=0%}
+    {% else %}
+    {% set order = order + 1%}
+    {% endif %}
+    {% endfor %}
+</div>
+{% endblock %}
