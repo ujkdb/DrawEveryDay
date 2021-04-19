@@ -7,6 +7,15 @@ footer {
 	font-family: Raleway;
 }
 
+main {
+	display: flex;
+	justify-content: center;
+}
+
+.register_form {
+	height: 100em;
+}
+
 .gallery-rows {
     display: flex;
     flex-direction: column;
