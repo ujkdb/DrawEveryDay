@@ -1,4 +1,3 @@
-import datetime
 import sqlalchemy
 from flask_login import UserMixin
 from sqlalchemy import orm
@@ -11,14 +10,13 @@ class User(SqlAlchemyBase, UserMixin):
     __tablename__ = 'users'
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
-    name = sqlalchemy.Column(sqlalchemy.String)
     email = sqlalchemy.Column(sqlalchemy.String, unique=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String)
-    modified_date = sqlalchemy.Column(sqlalchemy.DateTime, default=datetime.datetime.now)
+    name = sqlalchemy.Column(sqlalchemy.String, unique=True)
 
-    jobs = orm.relation("Jobs", back_populates='user')
+    """jobs = orm.relation("Jobs", back_populates='user')
 
-    departments = orm.relation("Departments", back_populates='user')
+    departments = orm.relation("Departments", back_populates='user')"""
 
     def __repr__(self):
         return f'<User> {self.id} {self.name} {self.email}'
