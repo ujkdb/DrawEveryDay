@@ -5,6 +5,10 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from data import db_session
 from forms.user import RegisterForm, LoginForm
 
+from threading import Thread
+import schedule
+import time
+
 app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -81,5 +85,21 @@ def update_task(difficulty):
     return redirect('/draw_task/' + difficulty)
 
 
+def update_all_tasks():
+    pass
+
+
+def timing_update():
+    schedule.every(1).days.do(update_all_tasks)
+    while True:
+        schedule.run_pending()
+        time.sleep(3600)
+
+
 if __name__ == '__main__':
+    every_day_thread = Thread(target=timing_update, name='every_day')
+    every_day_thread.start()
+
     main()
+
+    every_day_thread.join()
