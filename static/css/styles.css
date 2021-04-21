@@ -10,6 +10,7 @@ footer {
 main {
 	display: flex;
 	justify-content: center;
+	font-family: Raleway;
 }
 
 .register_form {
@@ -30,4 +31,10 @@ main {
     margin: 1em;
     width: 15em;
     height: 15em;
+}
+
+.column-center {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
 }
