@@ -13,10 +13,7 @@ class User(SqlAlchemyBase, UserMixin):
     email = sqlalchemy.Column(sqlalchemy.String, unique=True)
     hashed_password = sqlalchemy.Column(sqlalchemy.String)
     name = sqlalchemy.Column(sqlalchemy.String, unique=True)
-
-    """jobs = orm.relation("Jobs", back_populates='user')
-
-    departments = orm.relation("Departments", back_populates='user')"""
+    current_task = sqlalchemy.Column(sqlalchemy.Integer)
 
     def __repr__(self):
         return f'<User> {self.id} {self.name} {self.email}'

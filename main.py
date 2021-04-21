@@ -1,3 +1,4 @@
+import random
 import requests
 from flask import Flask, render_template, redirect, request, abort
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
@@ -5,6 +6,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from data import db_session
 from forms.user import RegisterForm, LoginForm
 from data.users import User
+from data.tasks import Task
 
 app = Flask(__name__)
 login_manager = LoginManager()
@@ -55,13 +57,22 @@ def reqister():
         user = User(
             name=form.name.data,
             email=form.email.data,
-            hashed_password=form.password.data
+            hashed_password=form.password.data,
+            current_task=add_task()
         )
         user.set_password(form.password.data)
         db_sess.add(user)
         db_sess.commit()
         return redirect('/')
     return render_template('register_form.html', title='Регистрация', form=form)
+
+
+def add_task():
+    db_sess = db_session.create_session()
+    tasks = db_sess.query(Task).all()
+    task = random.choice(tasks)
+    print(len(tasks))
+    return task.id
 
 
 if __name__ == '__main__':
