@@ -8,6 +8,10 @@ from forms.user import RegisterForm, LoginForm
 from data.users import User
 from data.tasks import Task
 
+from threading import Thread
+import schedule
+import time
+
 app = Flask(__name__)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -27,7 +31,7 @@ def main():
 
 @app.route("/")
 def index():
-    return render_template("base.html")
+    return render_template("base.html", title='DrawEveryDay')
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -75,5 +79,40 @@ def add_task():
     return task.id
 
 
+@app.route('/draw_task/<difficulty>')
+def draw_task(difficulty):
+    return render_template('draw_task.html', difficulty=difficulty,
+                           image_cap='https://winx-fan.ru/800/600/https/pbs.twimg.com/media/EekZ0QAWAAEVCk4.jpg',
+                           caption='зайчик',
+                           fact='на самом деле, рыть норы — привычка кроликов. Зайцы же предпочитают обустраивать '
+                                'свои гнёзда в неглубоких ямах.')
+
+
+@app.route('/draw_task')
+def draw_task_default():
+    return draw_task('easy')
+
+
+@app.route('/update_task/<difficulty>')
+def update_task(difficulty):
+    return redirect('/draw_task/' + difficulty)
+
+
+def update_all_tasks():
+    pass
+
+
+def timing_update():
+    schedule.every(1).days.do(update_all_tasks)
+    while True:
+        schedule.run_pending()
+        time.sleep(3600)
+
+
 if __name__ == '__main__':
+    every_day_thread = Thread(target=timing_update, name='every_day')
+    every_day_thread.start()
+
     main()
+
+    every_day_thread.join()

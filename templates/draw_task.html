@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Рисование{% endblock %}
+
+{% block content %}
+<div class="column-center">
+	<div class="btn-group" role="group" aria-label="Basic radio toggle button group">
+		<input value="Легко" type="radio" class="btn-check" name="btnradio" id="easy" autocomplete="off">
+		<label class="btn btn-outline-success" for="easy">Лёгкая</label>
+		<input value="Средне" type="radio" class="btn-check" name="btnradio" id="medium" autocomplete="off">
+		<label class="btn btn-outline-warning" for="medium">Средняя</label>
+		<input value="Сложно" type="radio" class="btn-check" name="btnradio" id="hard" autocomplete="off">
+		<label class="btn btn-outline-danger" for="hard">Сложная</label>
+	</div>
+		
+	<script>
+		function printMessage(button) {
+			return function(e) {
+				ok = confirm("Вы действительно хотите перейти на сложность \"" + button.value + "\"? Это дейтсвие сотрёт ваше текущее задание.");
+				if(ok) {
+					last_btn = button;
+					document.location.href = '/update_task/' + button.id;
+				} else last_btn.checked = true;
+			}
+		}
+			
+		easy = document.getElementById('easy');
+		medium = document.getElementById('medium');
+		hard = document.getElementById('hard');
+			
+		let last_btn = {{ difficulty }}
+		last_btn.checked = true;
+			
+		easy.addEventListener("click", printMessage(easy));
+		medium.addEventListener("click", printMessage(medium));
+		hard.addEventListener("click", printMessage(hard));
+	</script>
+		
+	<div class="card text-center column-center" style="margin-top: 1em;">
+		<div><img src="{{ image_cap }}" class="card-img-top" alt="..." style="width: 30em;"></div>
+		<div class="card-body">
+			<h5 class="card-title"><b>Тема на сегодня:</b> {{ caption }}</h5>
+			<p class="card-text"><b>Интересный факт:</b> {{ fact }}</p>
+			<a href="#" class="btn btn-primary">Загрузить работу</a>
+		</div>
+	</div>
+</div>
+{% endblock %}
