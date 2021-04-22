@@ -11,9 +11,15 @@ class Picture(SqlAlchemyBase):
     name = sqlalchemy.Column(sqlalchemy.String)
     likes = sqlalchemy.Column(sqlalchemy.Integer)
 
+    task_id = sqlalchemy.Column(sqlalchemy.Integer,
+                                sqlalchemy.ForeignKey("tasks.id"))
+
     owner_id = sqlalchemy.Column(sqlalchemy.Integer,
                                  sqlalchemy.ForeignKey("users.id"))
+
     user = orm.relation('User')
+
+    task = orm.relation('Task')
 
     def __repr__(self):
         return f'<Picture> {self.id} {self.name} {self.likes} {self.owner_id}'
