@@ -53,11 +53,6 @@ def main():
 
 @app.route("/")
 def index():
-    return render_template("base.html", title='DrawEveryDay')
-
-
-@app.route('/gallery')
-def gallery():
     return render_template('gallery.html', files=['../static/img/draw_icon.png'] * 9)
 
 
@@ -66,7 +61,7 @@ def login():
     form = LoginForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
-        user = db_sess.query(User).filter(User.name == form.name.data).first()
+        user = db_sess.query(User).filter(User.email == form.email.data).first()
         if user and user.check_password(form.password.data):
             login_user(user, remember=form.remember_me.data)
             return redirect("/")
