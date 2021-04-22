@@ -18,6 +18,28 @@ login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 
+def authorise_only(foo):
+    def new_foo(*args, **kwargs):
+        if current_user.is_authorized():
+            return foo(*args, **kwargs)
+        else:
+            return redirect('/login')
+
+    return new_foo
+
+
+def developer_only(foo):
+    foo = authorise_only(foo)
+
+    def new_foo(*args, **kwargs):
+        if current_user.name == 'admin':
+            return foo(*args, **kwargs)
+        else:
+            return "You haven't access to this page"
+
+    return new_foo
+
+
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
@@ -32,6 +54,11 @@ def main():
 @app.route("/")
 def index():
     return render_template("base.html", title='DrawEveryDay')
+
+
+@app.route('/gallery')
+def gallery():
+    return render_template('gallery.html', files=['../static/img/draw_icon.png'] * 9)
 
 
 @app.route('/login', methods=['GET', 'POST'])
