@@ -18,28 +18,6 @@ login_manager.init_app(app)
 app.config['SECRET_KEY'] = 'yandexlyceum_secret_key'
 
 
-def authorise_only(foo):
-    def new_foo(*args, **kwargs):
-        if current_user.is_authorized():
-            return foo(*args, **kwargs)
-        else:
-            return redirect('/login')
-
-    return new_foo
-
-
-def developer_only(foo):
-    foo = authorise_only(foo)
-
-    def new_foo(*args, **kwargs):
-        if current_user.name == 'admin':
-            return foo(*args, **kwargs)
-        else:
-            return "You haven't access to this page"
-
-    return new_foo
-
-
 @login_manager.user_loader
 def load_user(user_id):
     db_sess = db_session.create_session()
@@ -93,6 +71,13 @@ def reqister():
     return render_template('register_form.html', title='Регистрация', form=form)
 
 
+@app.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    return redirect("/")
+
+
 def add_random_task(difficulty=0):
     db_sess = db_session.create_session()
     tasks = db_sess.query(Task).filter(Task.difficulty == difficulty).all()
@@ -102,8 +87,10 @@ def add_random_task(difficulty=0):
 
 @app.route('/draw_task/')
 def draw_task():
+    if not current_user.is_authenticated:
+        return redirect('/login')
+
     task = db_session.create_session().query(Task).filter(Task.id == current_user.current_task).first()
-    print('draw_task', task)
     difficulty = ('easy', 'medium', 'hard')[task.difficulty]
     return render_template('draw_task.html', difficulty=difficulty,
                            image_cap=task.image,
@@ -111,10 +98,12 @@ def draw_task():
                            fact=task.description)
 
 
-@app.route('/draw_task/<int:task>')
+@app.route('/draw_task/<int:task>/')
 def show_task(task):
+    if not (current_user.is_authenticated and current_user.name == 'admin'):
+        return 'You can\'t access to this page'
+
     task = db_session.create_session().query(Task).filter(Task.id == task).first()
-    print('draw_task', task)
     difficulty = ('easy', 'medium', 'hard')[task.difficulty]
     return render_template('draw_task.html', difficulty=difficulty,
                            image_cap=task.image,
@@ -124,9 +113,11 @@ def show_task(task):
 
 @app.route('/update_task/<difficulty>')
 def update_task(difficulty):
+    if not current_user.is_authenticated:
+        return redirect('/login')
+
     task = add_random_task({'easy': 0, 'medium': 1, 'hard': 2}[difficulty])
     current_user.current_task = task.id
-    print('update_task', task)
     db_sess = db_session.create_session()
     db_sess.merge(current_user)
     db_sess.commit()
@@ -135,6 +126,9 @@ def update_task(difficulty):
 
 @app.route('/update_all_task')
 def update_all_tasks():
+    if not (current_user.is_authenticated and current_user.name == 'admin'):
+        return 'You can\'t access to this page'
+
     db_sess = db_session.create_session()
     for user in db_sess.query(User).all():
         task = db_sess.query(Task).filter(Task.id == user.current_task).first()
@@ -160,11 +154,14 @@ def user_data():
 
 @app.route('/check_random')
 def check_random():
+    if not (current_user.is_authenticated and current_user.name == 'admin'):
+        return 'You can\'t access to this page'
+
     easy = [add_random_task(0) for _ in range(100)]
     medium = [add_random_task(1) for _ in range(100)]
     hard = [add_random_task(2) for _ in range(100)]
 
-    return str(set(easy)) + '<br>' + str(set(medium)) + '<br>' + str(set(hard))
+    return str(easy) + '<br>' + str(medium) + '<br>' + str(hard)
 
 
 if __name__ == '__main__':
