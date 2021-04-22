@@ -62,7 +62,7 @@ def reqister():
             name=form.name.data,
             email=form.email.data,
             hashed_password=form.password.data,
-            current_task=add_task()
+            current_task=add_random_task().id
         )
         user.set_password(form.password.data)
         db_sess.add(user)
@@ -71,35 +71,55 @@ def reqister():
     return render_template('register_form.html', title='Регистрация', form=form)
 
 
-def add_task():
+def add_random_task(difficulty=0):
     db_sess = db_session.create_session()
-    tasks = db_sess.query(Task).all()
+    tasks = db_sess.query(Task).filter(Task.difficulty == difficulty).all()
     task = random.choice(tasks)
-    print(len(tasks))
-    return task.id
+    return task
 
 
-@app.route('/draw_task/<difficulty>')
-def draw_task(difficulty):
+@app.route('/draw_task/')
+def draw_task():
+    task = db_session.create_session().query(Task).filter(Task.id == current_user.current_task).first()
+    print('draw_task', task)
+    difficulty = ('easy', 'medium', 'hard')[task.difficulty]
     return render_template('draw_task.html', difficulty=difficulty,
-                           image_cap='https://winx-fan.ru/800/600/https/pbs.twimg.com/media/EekZ0QAWAAEVCk4.jpg',
-                           caption='зайчик',
-                           fact='на самом деле, рыть норы — привычка кроликов. Зайцы же предпочитают обустраивать '
-                                'свои гнёзда в неглубоких ямах.')
+                           image_cap=task.image,
+                           caption=task.name,
+                           fact=task.description)
 
 
-@app.route('/draw_task')
-def draw_task_default():
-    return draw_task('easy')
+@app.route('/draw_task/<int:task>')
+def show_task(task):
+    task = db_session.create_session().query(Task).filter(Task.id == task).first()
+    print('draw_task', task)
+    difficulty = ('easy', 'medium', 'hard')[task.difficulty]
+    return render_template('draw_task.html', difficulty=difficulty,
+                           image_cap=task.image,
+                           caption=task.name,
+                           fact=task.description)
 
 
 @app.route('/update_task/<difficulty>')
 def update_task(difficulty):
-    return redirect('/draw_task/' + difficulty)
+    task = add_random_task({'easy': 0, 'medium': 1, 'hard': 2}[difficulty])
+    current_user.task = task.id
+    print('update_task', task)
+    db_sess = db_session.create_session()
+    db_sess.merge(current_user)
+    db_sess.commit()
+    return redirect('/draw_task')
 
 
+@app.route('/update_all_task')
 def update_all_tasks():
-    pass
+    db_sess = db_session.create_session()
+    for user in db_sess.query(User).all():
+        task = db_sess.query(Task).filter(Task.id == user.current_task).first()
+        user.current_task = add_random_task(task.difficulty).id
+        db_sess.merge(user)
+    db_sess.commit()
+    return redirect('/draw_task')
 
 
 def timing_update():
@@ -107,6 +127,22 @@ def timing_update():
     while True:
         schedule.run_pending()
         time.sleep(3600)
+
+
+@app.route('/user_data')
+def user_data():
+    if current_user.is_authenticated:
+        return current_user.name
+    return 'anonymous'
+
+
+@app.route('/check_random')
+def check_random():
+    easy = [add_random_task(0) for _ in range(100)]
+    medium = [add_random_task(1) for _ in range(100)]
+    hard = [add_random_task(2) for _ in range(100)]
+
+    return str(set(easy)) + '<br>' + str(set(medium)) + '<br>' + str(set(hard))
 
 
 if __name__ == '__main__':

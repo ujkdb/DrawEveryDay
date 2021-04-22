@@ -9,7 +9,9 @@ class Task(SqlAlchemyBase, UserMixin):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     name = sqlalchemy.Column(sqlalchemy.String, unique=True)
+    difficulty = sqlalchemy.Column(sqlalchemy.Integer)
     description = sqlalchemy.Column(sqlalchemy.String)
+    image = sqlalchemy.Column(sqlalchemy.String)
 
     def __repr__(self):
-        return f'<Task> {self.id} {self.name} {self.email}'
+        return self.name
