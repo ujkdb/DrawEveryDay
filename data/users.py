@@ -15,7 +15,7 @@ class User(SqlAlchemyBase, UserMixin):
     name = sqlalchemy.Column(sqlalchemy.String, unique=True)
     current_task = sqlalchemy.Column(sqlalchemy.Integer)
 
-    pictures = orm.relation("Picture", back_populates='user')
+    # pictures = orm.relation("Picture", back_populates='user')
 
     def __repr__(self):
         return f'<User> {self.id} {self.name} {self.email}'

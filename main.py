@@ -103,7 +103,7 @@ def show_task(task):
 @app.route('/update_task/<difficulty>')
 def update_task(difficulty):
     task = add_random_task({'easy': 0, 'medium': 1, 'hard': 2}[difficulty])
-    current_user.task = task.id
+    current_user.current_task = task.id
     print('update_task', task)
     db_sess = db_session.create_session()
     db_sess.merge(current_user)
