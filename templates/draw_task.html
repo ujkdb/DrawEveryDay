@@ -42,6 +42,11 @@
 			<h5 class="card-title"><b>Тема на сегодня:</b> {{ caption }}</h5>
 			<p class="card-text"><b>Интересный факт:</b> {{ fact }}</p>
 			<a href="#" class="btn btn-primary">Загрузить работу</a>
+			<form method="post" enctype="multipart/form-data">
+				{{ form.hidden_tag() }}
+				{{ form.picture }}
+				<input type="submit">
+			</form>
 		</div>
 	</div>
 </div>

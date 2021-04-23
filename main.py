@@ -1,12 +1,15 @@
 import random
+import os
 import requests
 from flask import Flask, render_template, redirect, request, abort
 from flask_login import LoginManager, login_user, login_required, logout_user, current_user
+from werkzeug.utils import secure_filename
 
 from data import db_session
 from forms.user import RegisterForm, LoginForm
 from data.users import User
 from data.tasks import Task
+from forms.picture import UploadForm
 
 from threading import Thread
 import schedule
@@ -85,14 +88,21 @@ def add_random_task(difficulty=0):
     return task
 
 
-@app.route('/draw_task/')
+@app.route('/draw_task/', methods=['GET', 'POST'])
 def draw_task():
     if not current_user.is_authenticated:
         return redirect('/login')
-
+    form = UploadForm()
     task = db_session.create_session().query(Task).filter(Task.id == current_user.current_task).first()
     difficulty = ('easy', 'medium', 'hard')[task.difficulty]
-    return render_template('draw_task.html', difficulty=difficulty,
+    if form.validate_on_submit():
+        f = form.picture.data
+        filename = secure_filename(f.filename)
+        f.save(os.path.join(
+            'users_pictures', filename
+        ))
+        return redirect('/')
+    return render_template('draw_task.html', form=form, difficulty=difficulty,
                            image_cap=task.image,
                            caption=task.name,
                            fact=task.description)
