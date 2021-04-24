@@ -3,6 +3,12 @@
 {% block title %}Рисование{% endblock %}
 
 {% block content %}
+<style>
+	.alert {
+		margin: 0.75em 0 !important
+	}
+</style>
+
 <div class="column-center" style="margin: 0 50em">
 	<div class="btn-group" role="group" aria-label="Basic radio toggle button group">
 		<input value="Легко" type="radio" class="btn-check" name="btnradio" id="easy" autocomplete="off">
@@ -41,13 +47,30 @@
 		<div class="card-body">
 			<h5 class="card-title"><b>Тема на сегодня:</b> {{ caption }}</h5>
 			<p class="card-text"><b>Интересный факт:</b> {{ fact }}</p>
-			<a href="#" class="btn btn-primary">Загрузить работу</a>
-			<form method="post" enctype="multipart/form-data">
+			
+			<form method="post" enctype="multipart/form-data" id="upload_image">
 				{{ form.hidden_tag() }}
-				{{ form.picture }}
-				<input type="submit">
+				{{ form.picture(class="btn btn-primary", id="upload_button") }}
 			</form>
-			{{message}}
+			
+			{% if done_message %}
+			<div class="alert alert-success" role="alert">{{ done_message }}</div>
+			{% endif %}
+			
+			{% if error_message %}
+			<div class="alert alert-danger" role="alert">{{ error_message }}</div>
+			{% endif %}
+			
+			{% for error in form.picture.errors %}
+			<div class="alert alert-danger" role="alert">{{ error }}</div>
+			{% endfor %}
+			
+			<script>
+				let form = document.getElementById("upload_image");
+				let uploading = document.getElementById("upload_button");
+				
+				uploading.oninput = function() { form.submit() };
+			</script>
 		</div>
 	</div>
 </div>

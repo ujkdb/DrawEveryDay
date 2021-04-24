@@ -23,9 +23,26 @@
 		<li><a href="/draw_task" class="nav-link px-2 link-dark">Рисовать</a></li>
     </ul>
 
-    <div class="col-md-3 text-end">
-		<a href="#"><img src="../static/img/person_icon.png" width="40" class="mx-2"></a>
-	  <button type="button" class="btn btn-outline-success me-2">Вход</button>
+	<div class="col-md-3 text-end">
+	{% if current_user.is_authenticated %}
+		<a id="user_name" href="#" class="link-dark">{{ current_user.name }}</a>
+		<a href="#" id="user_picture"><img src="../static/img/person_icon.png" width="40" class="mx-2"></a>
+		<script>
+			function confirmLogout() {
+				close = confirm("Вы уверены, что хотите выйти?");
+				if(close) document.location.href = "/logout";
+			}
+			
+			logout_link1 = document.getElementById("user_name");
+			logout_link2 = document.getElementById("user_picture");
+			
+			logout_link1.onclick = confirmLogout;
+			logout_link2.onclick = confirmLogout;
+		</script>
+	{% else %}
+		<a href="/login"><img src="../static/img/person_icon.png" width="40" class="mx-2"></a>
+		<a href="/login" class="btn btn-outline-success me-2">Вход</a>
+	{% endif %}
 	</div>
 </header>
 

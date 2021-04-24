@@ -1,3 +1,4 @@
+import sys
 import random
 import os
 import requests
@@ -6,6 +7,7 @@ from flask_login import LoginManager, login_user, login_required, logout_user, c
 from werkzeug.utils import secure_filename
 
 from data import db_session
+from data.pictures import Picture
 from forms.user import RegisterForm, LoginForm
 from data.users import User
 from data.tasks import Task
@@ -103,20 +105,20 @@ def draw_task():
                                    image_cap=task.image,
                                    caption=task.name,
                                    fact=task.description,
-                                   message="Неверный формат")
+                                   error_message="Неверный формат")
         db_sess = db_session.create_session()
         if db_sess.query(Picture).filter(Picture.name == filename).first():
             return render_template('draw_task.html', form=form, difficulty=difficulty,
                                    image_cap=task.image,
                                    caption=task.name,
                                    fact=task.description,
-                                   message="Вы уже отправляли этот файл")
+                                   error_message="Вы уже отправляли этот файл")
         if db_sess.query(Picture).filter(Picture.task_id == task.id).first():
             return render_template('draw_task.html', form=form, difficulty=difficulty,
                                    image_cap=task.image,
                                    caption=task.name,
                                    fact=task.description,
-                                   message="Вы уже отправляли это задание")
+                                   error_message="Вы уже отправляли это задание")
         picture = Picture(
             name=filename,
             owner_id=current_user.id,
@@ -131,7 +133,7 @@ def draw_task():
                                image_cap=task.image,
                                caption=task.name,
                                fact=task.description,
-                               message="Рисунок отправлен!")
+                               done_message="Рисунок отправлен!")
     return render_template('draw_task.html', form=form, difficulty=difficulty,
                            image_cap=task.image,
                            caption=task.name,
@@ -202,6 +204,11 @@ def check_random():
     hard = [add_random_task(2) for _ in range(100)]
 
     return str(easy) + '<br>' + str(medium) + '<br>' + str(hard)
+
+
+@app.route('/close_server')
+def stop_server():
+    sys.exit()
 
 
 if __name__ == '__main__':
