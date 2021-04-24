@@ -8,7 +8,7 @@
     {% if loop.index % 3 == 1 %}
     <div class="gallery-row">
     {% endif %}
-        <img class="miniature rounded-3 border" src="{{ path }}">
+        <a href="/discover_image/{{ path[1] }}"><img class="miniature rounded-3 border" src="{{ path[0] }}"></a>
     {% if loop.index % 3 == 0 %}
     </div>
     {% endif %}

@@ -29,8 +29,11 @@ main {
 
 .miniature {
     margin: 1em;
-    width: 15em;
     height: 15em;
+    width: 15em;
+    display: block;
+    object-fit: contain;
+    object-position: 50% 50%;
 }
 
 .column-center {

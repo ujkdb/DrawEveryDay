@@ -29,6 +29,12 @@ def load_user(user_id):
     return db_sess.query(User).get(user_id)
 
 
+def get_file_extension(filename: str):
+    filename = filename[::-1]
+    filename = filename[:filename.find('.')]
+    return '.' + filename[::-1]
+
+
 def main():
     db_session.global_init("db/draweveryday.db")
     app.run()
@@ -36,7 +42,15 @@ def main():
 
 @app.route("/")
 def index():
-    return render_template('gallery.html', files=['../static/img/draw_icon.png'] * 9)
+    os.chdir(os.path.dirname(sys.argv[0]) + '/static/users_pictures')
+    files = list(map(lambda x: ('../static/users_pictures/' + x, x), os.listdir()))
+    return render_template('gallery.html', files=files)
+
+
+@app.route('/discover_image/<picture_name>')
+def discover_image(picture_name):
+    return f'<h1>Здесь будет красивый просмотр с указанием некоторых данных</h1>' \
+           f'<img src=../static/users_pictures/{picture_name}>'
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -99,8 +113,8 @@ def draw_task():
     difficulty = ('easy', 'medium', 'hard')[task.difficulty]
     if form.validate_on_submit():
         f = form.picture.data
-        filename = secure_filename(f.filename)
-        if filename[-4::] != ".jpg" and filename[-5::] != ".jpeg" and filename[-4::] != ".png":
+        filename = f.filename
+        if not (filename.endswith(".jpg") or filename.endswith(".jpeg") or filename.endswith(".png")):
             return render_template('draw_task.html', form=form, difficulty=difficulty,
                                    image_cap=task.image,
                                    caption=task.name,
@@ -126,8 +140,13 @@ def draw_task():
         )
         db_sess.add(picture)
         db_sess.commit()
+
+        picture.name = str(picture.id) + get_file_extension(picture.name)
+        db_sess.merge(picture)
+        db_sess.commit()
+
         f.save(os.path.join(
-            'users_pictures', filename
+            'static/users_pictures', picture.name
         ))
         return render_template('draw_task.html', form=form, difficulty=difficulty,
                                image_cap=task.image,
