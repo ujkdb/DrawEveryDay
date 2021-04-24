@@ -54,7 +54,7 @@ def discover_image(picture_name):
     task = db_sess.query(Task).filter(Task.id == picture.task_id).first()
 
     return render_template('discover_image.html', username=user.name, task=task.name.capitalize(),
-                           picture_name=picture_name)
+                           picture_name=picture_name, task_difficulty=task.difficulty)
 
 
 @app.route('/login', methods=['GET', 'POST'])

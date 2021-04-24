@@ -14,6 +14,11 @@
     <img class="stretch-image border" style="width: 40em; height: 40em;" src="../static/users_pictures/{{ picture_name}}">
 </div>
 <div style="font-size: 1.5em; margin-left: 1em">
-    Автор: <b><a id="user_name" href="#" class="link-dark">{{ current_user.name }}</a></b>
+    Автор: <b><a id="user_name" href="#" class="link-dark">{{ current_user.name }}</a></b><br>
+    Сложность: <b>
+    {% if task_difficulty == 0 %}<span style="color: green;">Лёгкий</span>{% endif %}
+    {% if task_difficulty == 1 %}<span style="color: orange;">Средний</span>{% endif %}
+    {% if task_difficulty == 2 %}<span style="color: red;">Сложный</span>{% endif %}
+</b>
 </div>
 {% endblock %}
