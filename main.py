@@ -98,10 +98,40 @@ def draw_task():
     if form.validate_on_submit():
         f = form.picture.data
         filename = secure_filename(f.filename)
+        if filename[-4::] != ".jpg" and filename[-5::] != ".jpeg" and filename[-4::] != ".png":
+            return render_template('draw_task.html', form=form, difficulty=difficulty,
+                                   image_cap=task.image,
+                                   caption=task.name,
+                                   fact=task.description,
+                                   message="Неверный формат")
+        db_sess = db_session.create_session()
+        if db_sess.query(Picture).filter(Picture.name == filename).first():
+            return render_template('draw_task.html', form=form, difficulty=difficulty,
+                                   image_cap=task.image,
+                                   caption=task.name,
+                                   fact=task.description,
+                                   message="Вы уже отправляли этот файл")
+        if db_sess.query(Picture).filter(Picture.task_id == task.id).first():
+            return render_template('draw_task.html', form=form, difficulty=difficulty,
+                                   image_cap=task.image,
+                                   caption=task.name,
+                                   fact=task.description,
+                                   message="Вы уже отправляли это задание")
+        picture = Picture(
+            name=filename,
+            owner_id=current_user.id,
+            task_id=task.id
+        )
+        db_sess.add(picture)
+        db_sess.commit()
         f.save(os.path.join(
             'users_pictures', filename
         ))
-        return redirect('/')
+        return render_template('draw_task.html', form=form, difficulty=difficulty,
+                               image_cap=task.image,
+                               caption=task.name,
+                               fact=task.description,
+                               message="Рисунок отправлен!")
     return render_template('draw_task.html', form=form, difficulty=difficulty,
                            image_cap=task.image,
                            caption=task.name,

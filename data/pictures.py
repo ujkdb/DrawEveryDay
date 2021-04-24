@@ -9,7 +9,6 @@ class Picture(SqlAlchemyBase):
 
     id = sqlalchemy.Column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     name = sqlalchemy.Column(sqlalchemy.String)
-    likes = sqlalchemy.Column(sqlalchemy.Integer)
 
     task_id = sqlalchemy.Column(sqlalchemy.Integer,
                                 sqlalchemy.ForeignKey("tasks.id"))
