@@ -1,0 +1,23 @@
+{% extends "gallery.html" %}
+
+{% block title %}{{ username }}{% endblock %}
+
+{% block extend_information %}
+<div style="font-family: Raleway; display: flex; justify-content: center; margin-bottom: 1.5em;">
+    <div style="margin-right: 5em"><img src="../static/img/person_icon.png"></div>
+    <div class="gallery-rows">
+        <div style="font-size: 1.5em">
+            {{ username }}
+            {% if your_account %}
+            <span style="font-size: 0.7em" class="badge rounded-pill bg-light text-dark">ВАШ АККАУНТ</span>
+            {% endif %}
+        </div>
+        <div class="fw-light">Всего фотографий: {{ files|length }}</div>
+    </div>
+    <div style="margin-left: 5em;">
+        {% if your_account %}
+        <a href="/logout" class="btn btn-danger">Выйти</a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

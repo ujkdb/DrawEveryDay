@@ -54,7 +54,22 @@ def discover_image(picture_name):
     task = db_sess.query(Task).filter(Task.id == picture.task_id).first()
 
     return render_template('discover_image.html', username=user.name, task=task.name.capitalize(),
-                           picture_name=picture_name, task_difficulty=task.difficulty)
+                           picture_name=picture_name, task_difficulty=task.difficulty, user_id=user.id)
+
+
+@app.route('/user/<int:user_id>')
+def show_user(user_id):
+    db_sess = db_session.create_session()
+    user = db_sess.query(User).filter(User.id == user_id).first()
+    images = map(lambda x: x.name, db_sess.query(Picture).filter(Picture.owner_id == user_id).all())
+
+    os.chdir(os.path.dirname(sys.argv[0]) + '/static/users_pictures')
+    files = list(filter(lambda x: x in images, os.listdir()))
+
+    your_account = current_user.is_authenticated and current_user.id == user_id
+
+    return render_template('show_user.html', username=user.name, files=files,
+                           your_account=your_account)
 
 
 @app.route('/login', methods=['GET', 'POST'])
