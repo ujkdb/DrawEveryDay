@@ -43,14 +43,18 @@ def main():
 @app.route("/")
 def index():
     os.chdir(os.path.dirname(sys.argv[0]) + '/static/users_pictures')
-    files = list(map(lambda x: ('../static/users_pictures/' + x, x), os.listdir()))
-    return render_template('gallery.html', files=files)
+    return render_template('gallery.html', files=os.listdir())
 
 
 @app.route('/discover_image/<picture_name>')
 def discover_image(picture_name):
-    return f'<h1>Здесь будет красивый просмотр с указанием некоторых данных</h1>' \
-           f'<img src=../static/users_pictures/{picture_name}>'
+    db_sess = db_session.create_session()
+    picture = db_sess.query(Picture).filter(Picture.name == picture_name).first()
+    user = db_sess.query(User).filter(User.id == picture.owner_id).first()
+    task = db_sess.query(Task).filter(Task.id == picture.task_id).first()
+
+    return render_template('discover_image.html', username=user.name, task=task.name.capitalize(),
+                           picture_name=picture_name)
 
 
 @app.route('/login', methods=['GET', 'POST'])

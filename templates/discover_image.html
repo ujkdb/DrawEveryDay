@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}{{ task }} от {{ username }}{% endblock %}
+
+{% block content %}
+<style>
+    main {
+        margin-left: 2em;
+        justify-content: flex-start !important;
+    }
+</style>
+
+<div>
+    <img class="stretch-image border" style="width: 40em; height: 40em;" src="../static/users_pictures/{{ picture_name}}">
+</div>
+<div style="font-size: 1.5em; margin-left: 1em">
+    Автор: <b><a id="user_name" href="#" class="link-dark">{{ current_user.name }}</a></b>
+</div>
+{% endblock %}
