@@ -16,4 +16,4 @@ class Task(SqlAlchemyBase):
     pictures = orm.relation("Picture", back_populates='task')
 
     def __repr__(self):
-        return self.name
+        return f"<Task> {self.id} {self.name} {self.difficulty}"
