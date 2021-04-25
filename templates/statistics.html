@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block styles %}
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.0.1/lib/anime.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+{% endblock %}
+
+{% block title %}Статистика{% endblock %}
+
+{% block content %}
+<div class="stats-main">
+    <div style="display: flex; justify-content: space-between;">
+        <h3 class="animate__animated animate__backInLeft">Ваш уровень: {{ current_user.rank }}</h3>
+        <div style="display: flex">
+            <div class="progress" style="margin-left: 5em; width: 20em; margin-top: 0.9em">
+            <div id="animating-pb" class="progress-bar progress-bar-striped bg-info" role="progressbar"
+                style="width: 0%" aria-valuenow="0"
+                 aria-valuemin="0" aria-valuemax="100">{{ score_num }}</div>
+            </div>
+            <div style="font-size: 1.5em; margin-left: 0.3em;">{{ current_user.rank * 10 }}</div>
+        </div>
+    </div>
+    <div class="progress" style="margin-top: 5em;">
+        <div id="easy-pb" class="progress-bar bg-success" role="progressbar" style="width: {{ easy }}%"
+             aria-valuenow="{{ easy }}" aria-valuemin="0" aria-valuemax="100">легко</div>
+        <div id="medium-pb" class="progress-bar bg-warning" role="progressbar" style="width: {{ medium }}%"
+             aria-valuenow="{{ medium }}" aria-valuemin="0" aria-valuemax="100">средне</div>
+        <div id="hard-pb" class="progress-bar bg-danger" role="progressbar"
+             style="width: {{ hard + (100 - easy - medium - hard)}}%"
+             aria-valuenow="{{ hard + (100 - easy - medium - hard)}}"
+             aria-valuemin="0" aria-valuemax="100">сложно</div>
+    </div>
+
+    <pre style="margin-top: 2em" class="animate__animated animate__backInUp animate__delay-1s
+										animate__slow">{{ post_scriptum }}</pre>
+
+    <div style="display: flex; margin-top: 3em;">
+        {% if current_user.rank == 1 %}
+        <img src="../static/img/person_icon.png" style="margin-right: 1.5em">
+        <div><h4 class="animate__animated  animate__fadeInUp animate__delay-4s">Обычный смертный</h4>
+            <p class="animate__animated animate__fadeIn animate__delay-4s">Ранг самого обычного человека. У вас очень большой потенциал — <br>
+            из 5 рангов вы узнали только о первом.</p>
+        </div>
+        {% endif %}
+
+        {% if current_user.rank == 2 %}
+        <img src="../static/img/artist_icon.png" style="margin-right: 1.5em">
+        <div><h4 class="animate__animated  animate__fadeInUp animate__delay-4s">Придворный художник</h4>
+            <p class="animate__animated animate__fadeIn animate__delay-4s">Ваш талант гениален, милорд. Когда-нибудь Вы станете столь же великим,<br>
+            что и Ван Гог в свои годы. А пока — Вам ещё многое недоступно.</p>
+        </div>
+        {% endif %}
+
+        {% if current_user.rank == 3 %}
+        <img src="../static/img/knight_icon.png" style="margin-right: 1.5em">
+        <div><h4 class="animate__animated  animate__fadeInUp animate__delay-4s">Рыцарь высоких искусств</h4>
+            <p class="animate__animated animate__fadeIn animate__delay-4s">Вместо меча Вам в руки дана кисть. Так воспоём же славу нашего короля<br>
+            в картинах! Твори во имя Пикассо, и ты достигнешь 4го ранга!</p>
+        </div>
+        {% endif %}
+
+        {% if current_user.rank == 4 %}
+        <img src="../static/img/wizard_icon.png" style="margin-right: 1.5em">
+        <div><h4 class="animate__animated  animate__fadeInUp animate__delay-4s">Мерлин, маг древнейших сил искусства</h4>
+            Король доверяет Вам свою жизнь, ибо карандаш в Ваших руках — магический амулет.<br>
+            Животворящим исскуством Вы можете привести в бегство любого врага!</p>
+        </div>
+        {% endif %}
+
+        {% if current_user.rank == 5 %}
+        <img src="../static/img/king_icon.png" style="margin-right: 1.5em">
+        <div><h4 class="animate__animated  animate__fadeInUp animate__delay-4s">{{ current_user.name }} I</h4>
+            <p class="animate__animated animate__fadeIn animate__delay-4s">Вы единственный монарх, который может нарисовать собственный портрет. <br>
+            Рыцари сражаются за Ваши творения.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+	let myObj = document.getElementById('animating-pb');
+	
+	let battery = {
+		prop1: 0,
+	}
+	
+	anime({
+		targets: battery,
+		prop1: {{ procents }},
+		  duration: 3000,
+		easing: 'linear',
+		round: 1,
+		update: function() {
+			myObj.style = 'width: ' + String(battery.prop1) + '%';
+			myObj.setAttribute('aria-valuenow', String(battery.prop1))
+	}
+});
+</script>
+{% endblock %}
