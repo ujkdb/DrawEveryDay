@@ -79,7 +79,7 @@ def login():
             login_user(user, remember=form.remember_me.data)
             # и перенаправляем на галерею
             return redirect("/")
-        # если пользователь ввёл неправильный логин или пароль, возвращаем тот-же шаблон и сообщаем ему об этом
+        # если пользователь ввёл неправильный логин или пароль, возвращаем шаблон и сообщаем ему об этом
         return render_template('login_form.html', message="Неправильный логин или пароль", form=form)
     # возвращаем шаблон с заголовком и формой, если пользователь её не заполнил
     return render_template('login_form.html', title='Авторизация', form=form)
@@ -104,14 +104,14 @@ def reqister():
     if form.validate_on_submit():
         # сверяем пароли
         if form.password.data != form.password_again.data:
-            # если пользователь ввёл несовпадающие пароли, возвращаем тот-же шаблон и сообщаем ему об этом
+            # если пользователь ввёл несовпадающие пароли, возвращаем шаблон и сообщаем ему об этом
             return render_template('register_form.html', title='Регистрация', form=form,
                                    message="Пароли не совпадают")
         # создаем сессию с базой данных
         db_sess = db_session.create_session()
         # проверяем, есть ли уже в базе данных пользователь с введенной почтой
         if db_sess.query(User).filter(User.email == form.email.data).first():
-            # если да, возвращаем тот-же шаблон и сообщаем ему об этом
+            # если да, возвращаем шаблон и сообщаем ему об этом
             return render_template('register_form.html', title='Регистрация', form=form,
                                    message="Такой пользователь уже есть")
         # создаем новую запись
@@ -141,15 +141,17 @@ def show_user(user_id):
     db_sess = db_session.create_session()
     # находим пользователя
     user = db_sess.query(User).filter(User.id == user_id).first()
-    # находим его рисунки
+    # находим его рисунки в базе данных
     images = map(lambda x: x.name, db_sess.query(Picture).filter(Picture.owner_id == user_id).all())
 
+    # находим файлы рисунков
     os.chdir(os.path.dirname(sys.argv[0]) + '/static/users_pictures')
     files = list(filter(lambda x: x in images, os.listdir()))
 
     # узнаем свой это или чужой аккаунт
     your_account = current_user.is_authenticated and current_user.id == user_id
 
+    # возвращаем шаблон с изображением, именем пользователя, рисунками и информацией, свой ли это аккаунт
     return render_template('show_user.html', username=user.name, files=files,
                            your_account=your_account)
 
@@ -184,8 +186,9 @@ def draw_task():
         f = form.picture.data
         # получаем его имя
         filename = f.filename
-        # проверяем разрешение файла
+        # проверяем формат файла
         if not (filename.endswith(".jpg") or filename.endswith(".jpeg") or filename.endswith(".png")):
+            # если пользователь отправил файл с неправильным форматом, возвращаем шаблон и сообщаем ему об этом
             return render_template('draw_task.html', form=form, difficulty=difficulty,
                                    image_cap=task.image,
                                    caption=task.name,
@@ -195,6 +198,7 @@ def draw_task():
         db_sess = db_session.create_session()
         # проверяем, отправлял ли пользователь это задание в прошлом
         if db_sess.query(Picture).filter(Picture.task_id == task.id).first():
+            # если да, возвращаем шаблон и сообщаем ему об этом
             return render_template('draw_task.html', form=form, difficulty=difficulty,
                                    image_cap=task.image,
                                    caption=task.name,
@@ -222,13 +226,14 @@ def draw_task():
         f.save(os.path.join(
             'static/users_pictures/', picture.name
         ))
-        # пишем пользовалелю об успешной отправке рсунка
+        # и пишем пользовалелю об успешной отправке рисунка
         return render_template('draw_task.html', form=form, difficulty=difficulty,
                                image_cap=task.image,
                                caption=task.name,
                                fact=task.description,
                                done_message="Рисунок отправлен!")
-    # возвращаем шаблон если пользователь не загрузил рисунок
+    # возвращаем шаблон с формой, сложностью, изображением, названием и описанием задания,
+    # если пользователь не загрузил рисунок
     return render_template('draw_task.html', form=form, difficulty=difficulty,
                            image_cap=task.image,
                            caption=task.name,
