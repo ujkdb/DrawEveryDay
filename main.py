@@ -249,6 +249,16 @@ def stop_server():
     sys.exit()
 
 
+@app.route('/authors_information')
+def authors_information():
+    return render_template('author_information.html')
+
+
+@app.route('/license_information')
+def license_information():
+    return render_template('license_information.html')
+
+
 if __name__ == '__main__':
     every_day_thread = Thread(target=timing_update, name='every_day')
     every_day_thread.start()

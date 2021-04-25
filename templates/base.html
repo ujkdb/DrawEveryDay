@@ -8,6 +8,7 @@
 	<link href="https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="../static/css/fonts.css"/>
 	<link rel="stylesheet" href="../static/css/styles.css"/>
+	{% block styles %}{% endblock %}
 	<title>{{ title }}{% block title %}{% endblock %}</title>
 </head>
 
@@ -48,10 +49,10 @@
 		<div class="collapse navbar-collapse" id="navbarNav">
 			<ul class="navbar-nav">
 				<li class="nav-item">
-					<a class="nav-link" aria-current="page" href="#">Авторы</a>
+					<a class="nav-link" aria-current="page" href="authors_information">Авторы</a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link" href="#">Информация о лицензии</a>
+					<a class="nav-link" href="license_information">Информация о лицензии</a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link" href="https://github.com/Leamich/DrawEveryDay" target="_blank">GitHub</a>
