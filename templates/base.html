@@ -3,7 +3,6 @@
 <head>
 	<meta charset="utf-8">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
-	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 	<link rel="preconnect" href="https://fonts.gstatic.com">
 	<link href="https://fonts.googleapis.com/css2?family=Playfair+Display+SC:wght@700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="../static/css/fonts.css"/>
@@ -20,7 +19,7 @@
 
 	<ul class="nav col-12 col-md-auto mb-2 justify-content-center mb-md-0">
 		<li><a href="/" class="nav-link px-2 link-dark">Галерея</a></li>
-		<li><a href="#" class="nav-link px-2 link-dark">Статистика</a></li>
+		<li><a href="/statistics" class="nav-link px-2 link-dark">Статистика</a></li>
 		<li><a href="/draw_task" class="nav-link px-2 link-dark">Рисовать</a></li>
     </ul>
 
@@ -28,7 +27,7 @@
 	{% if current_user.is_authenticated %}
 		<a id="user_name" href="/user/{{ current_user.id }}" class="link-dark">{{ current_user.name }}</a>
 		<a href="/user/{{ current_user.id }}"
-		   id="user_picture"><img src="../static/img/person_icon.png" width="40" class="mx-2"></a>
+		   id="user_picture"><img src="../static/img/{{ current_user.get_rank_picture() }}_icon.png" width="40" class="mx-2"></a>
 	{% else %}
 		<a href="/login"><img src="../static/img/person_icon.png" width="40" class="mx-2"></a>
 		<a href="/login" class="btn btn-outline-success me-2">Вход</a>

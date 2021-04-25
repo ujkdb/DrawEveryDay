@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Статистика{% endblock %}
+
+{% block content %}
+<div class="stats-main">
+    <div style="display: flex; justify-content: space-between;">
+        <h3>Ваш уровень: {{ current_user.rank }}</h3>
+        <div style="display: flex">
+            <div class="progress" style="margin-left: 5em; width: 20em; margin-top: 0.9em">
+            <div class="progress-bar progress-bar-striped bg-info" role="progressbar"
+                style="width: {{ procents }}%" aria-valuenow="{{ procents }}"
+                 aria-valuemin="0" aria-valuemax="100">{{ score_num }}</div>
+            </div>
+            <div style="font-size: 1.5em; margin-left: 0.3em;">{{ current_user.rank * 10 }}</div>
+        </div>
+    </div>
+    <div class="progress" style="margin-top: 5em;">
+        <div class="progress-bar bg-success" role="progressbar" style="width: {{ easy }}%"
+             aria-valuenow="{{ easy }}" aria-valuemin="0" aria-valuemax="100">легко</div>
+        <div class="progress-bar bg-warning" role="progressbar" style="width: {{ medium }}%"
+             aria-valuenow="{{ medium }}" aria-valuemin="0" aria-valuemax="100">средне</div>
+        <div class="progress-bar bg-danger" role="progressbar"
+             style="width: {{ hard + (100 - easy - medium - hard)}}%"
+             aria-valuenow="{{ hard + (100 - easy - medium - hard)}}"
+             aria-valuemin="0" aria-valuemax="100">сложно</div>
+    </div>
+
+    <pre style="margin-top: 2em">{{ post_scriptum }}</pre>
+
+    <div style="display: flex; margin-top: 3em;">
+        {% if current_user.rank == 1 %}
+        <img src="../static/img/person_icon.png" style="margin-right: 1.5em">
+        <div><h4>Обычный смертный</h4>
+            Ранг самого обычного человека. У вас очень большой потенциал — <br>
+            из 5 рангов вы узнали только о первом.
+        </div>
+        {% endif %}
+
+        {% if current_user.rank == 2 %}
+        <img src="../static/img/artist_icon.png" style="margin-right: 1.5em">
+        <div><h4>Придворный художник</h4>
+            Ваш талант гениален, милорд. Когда-нибудь Вы станете столь же великим,<br>
+            что и Ван Гог в свои годы. А пока — Вам ещё многое недоступно.
+        </div>
+        {% endif %}
+
+        {% if current_user.rank == 3 %}
+        <img src="../static/img/knight_icon.png" style="margin-right: 1.5em">
+        <div><h4>Рыцарь высоких искусств</h4>
+            Вместо меча Вам в руки дана кисть. Так воспоём же славу нашего короля<br>
+            в картинах! Твори во имя Пикассо, и ты достигнешь 4го ранга!
+        </div>
+        {% endif %}
+
+        {% if current_user.rank == 4 %}
+        <img src="../static/img/wizard_icon.png" style="margin-right: 1.5em">
+        <div><h4>Мерлин, маг древнейших сил искусства</h4>
+            Король доверяет Вам свою жизнь, ибо карандаш в Ваших руках — магический амулет.<br>
+            Животворящим исскуством Вы можете привести в бегство любого врага!
+        </div>
+        {% endif %}
+
+        {% if current_user.rank == 5 %}
+        <img src="../static/img/king_icon.png" style="margin-right: 1.5em">
+        <div><h4>{{ current_user.name }} I</h4>
+            Вы единственный монарх, который может нарисовать собственный портрет. <br>
+            Рыцари сражаются за Ваши творения.
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -45,3 +45,8 @@ main {
 	flex-direction: column;
 	justify-content: center;
 }
+
+.stats-main {
+    display: flex;
+    flex-direction: column;
+}
