@@ -37,6 +37,7 @@ def get_file_extension(filename: str):
 
 def main():
     db_session.global_init("db/draweveryday.db")
+    os.chdir(os.getcwd() + '/static/users_pictures')
     app.run()
 
 
@@ -63,7 +64,6 @@ def show_user(user_id):
     user = db_sess.query(User).filter(User.id == user_id).first()
     images = map(lambda x: x.name, db_sess.query(Picture).filter(Picture.owner_id == user_id).all())
 
-    os.chdir(os.path.dirname(sys.argv[0]) + '/static/users_pictures')
     files = list(filter(lambda x: x in images, os.listdir()))
 
     your_account = current_user.is_authenticated and current_user.id == user_id
