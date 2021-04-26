@@ -63,7 +63,6 @@ def discover_image(picture_name):
                            picture_name=picture_name, task_difficulty=task.difficulty, user_id=user.id)
 
 
-
 """Авторизация, регистрация и выход из учетной записи"""
 
 
@@ -157,7 +156,7 @@ def show_user(user_id):
     your_account = current_user.is_authenticated and current_user.id == user_id
 
     # возвращаем шаблон с изображением, именем пользователя, рисунками и информацией, свой ли это аккаунт
-    return render_template('show_user.html', username=user.name, files=files,
+    return render_template('show_user.html', username=user.name, files=files, pic=user.get_rank_picture(),
                            your_account=your_account)
 
 
@@ -219,7 +218,7 @@ def draw_task():
 
         # сохраняем файл
         f.save(os.path.join(
-            'static/users_pictures/', picture.name
+            os.getcwd(), picture.name
         ))
         # и пишем пользовалелю об успешной отправке рисунка
         return render_template('draw_task.html', form=form, difficulty=difficulty,
@@ -227,7 +226,7 @@ def draw_task():
                                caption=task.name,
                                fact=task.description,
                                done_message="Рисунок отправлен!")
-    # возвращаем шаблон с формой, сложностью, изображением, названием и описанием задания,
+    # возвращаем шаблон с формой; сложностью, изображением, названием и описанием задания,
     # если пользователь не загрузил рисунок
     return render_template('draw_task.html', form=form, difficulty=difficulty,
                            image_cap=task.image,
@@ -287,7 +286,7 @@ def add_random_task(difficulty=0):
     return task
 
 
-# проверка рандома
+# проверка рандома (для разработчиков)
 @app.route('/check_random')
 def check_random():
     if not (current_user.is_authenticated and current_user.name == 'admin'):
@@ -336,11 +335,15 @@ def stats():
                    'hard': 'Вы склонны к выбору сложной сложности. \nНет сомнений, Вы — мастер. '
                            'Благо, у вас ещё есть шанс поставить себе вызов, попробовав уровни пониже.'
                    }[next(filter(lambda x: prefers[x], prefers.keys()))]
-
+    if total != 0:
+        return render_template('statistics.html', score_num=score_num,
+                               procents=score_num * 10 // current_user.rank,
+                               easy=easy * 100 // total, medium=medium * 100 // total,
+                               hard=hard * 100 // total, prefers=prefers, post_scriptum=prefers)
     return render_template('statistics.html', score_num=score_num,
                            procents=score_num * 10 // current_user.rank,
-                           easy=easy * 100 // total, medium=medium * 100 // total,
-                           hard=hard * 100 // total, prefers=prefers, post_scriptum=prefers)
+                           easy=0, medium=0,
+                           hard=0, prefers=prefers, post_scriptum=prefers)
 
 
 """Ассинхронное обновление заданий"""
