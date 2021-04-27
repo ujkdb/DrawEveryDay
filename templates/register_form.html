@@ -8,26 +8,57 @@
 <style>
 .formform {
 	display: flex;
-	justify-content: center;
+	flex-direction: column;
+	width: 50vw;
+}
+
+form > * {
+    margin: 1.5em 0;
 }
 </style>
 
 <div class="formform">
-    <form action="" method="post" novalidate>
+    {% if message %}<div class="alert alert-danger" role="alert">{{ message }}</div>{% endif %}
+
+    <form action="" method="post">
         <div>
             {{ form.csrf_token }}
         </div>
-        {% for field in form if field.name != 'csrf_token' %}
-            <div>
-                {{ field.label() }}
-                {{ field() }}
-                {% for error in field.errors %}
-                    <div class="error">{{ error }}</div>
-                {% endfor %}
-            </div>
-        {% endfor %}
-        {{message}}
-		<a href="/login">Уже есть аккаунт?</a>
+
+        <div class="form-floating mb-3">
+            {{ form.name(class="form-control", id="nameInput") }}
+            {{ form.name.label(for="nameInput") }}
+        </div>
+        {% if form.name.errors %}
+        <div class="alert alert-danger" role="alert">{{ form.name.errors[0] }}</div>
+        {% endif %}
+
+        <div class="form-floating mb-3">
+            {{ form.email(type="email", class="form-control", id="emailInput") }}
+            {{ form.email.label(for="emailInput") }}
+        </div>
+        {% if form.email.errors %}
+        <div class="alert alert-danger" role="alert">{{ form.email.errors[0] }}</div>
+        {% endif %}
+
+        <div class="form-floating mb-3">
+            {{ form.password(type="password", class="form-control", id="passwordInput") }}
+            {{ form.password.label(for="passwordInput") }}
+        </div>
+        {% if form.password.errors %}
+        <div class="alert alert-danger" role="alert">{{ form.password.errors[0] }}</div>
+        {% endif %}
+
+        <div class="form-floating mb-3">
+            {{ form.password_again(type="password", class="form-control", id="passwordAgainInput") }}
+            {{ form.password_again.label(for="passwordAgainInput") }}
+        </div>
+        {% if form.password_again.errors %}
+        <div class="alert alert-danger" role="alert">{{ form.password_again.errors[0] }}</div>
+        {% endif %}
+
+        {{ form.submit(class="btn btn-outline-dark") }}
     </form>
+    <a href="/login">Уже есть аккаунт?</a>
 </div>
 {% endblock %}

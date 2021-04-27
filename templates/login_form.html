@@ -8,25 +8,45 @@
 <style>
 .formform {
 	display: flex;
-	justify-content: center;
+	flex-direction: column;
+	width: 50vw;
+}
+
+form > * {
+    margin: 1.5em 0;
 }
 </style>
 
 <div class="formform">
+    {% if message %}<div class="alert alert-danger" role="alert">{{ message }}</div>{% endif %}
+
     <form action="" method="post" novalidate>
         <div>
             {{ form.csrf_token }}
         </div>
-        {% for field in form if field.name != 'csrf_token' %}
-            <div>
-                {{ field.label() }}
-                {{ field() }}
-                {% for error in field.errors %}
-                    <div class="error">{{ error }}</div>
-                {% endfor %}
-            </div>
-        {% endfor %}
-		<a href="/register">Еще не зарегистрированы?</a>
+        <div class="form-floating mb-3">
+            {{ form.email(type="email", class="form-control", id="emailInput") }}
+            {{ form.email.label(for="emailInput") }}
+        </div>
+        {% if form.email.errors %}
+        <div class="alert alert-danger" role="alert">{{ form.email.errors[0] }}</div>
+        {% endif %}
+
+        <div class="form-floating mb-3">
+            {{ form.password(type="password", class="form-control", id="passwordInput") }}
+            {{ form.password.label(for="passwordInput") }}
+        </div>
+        {% if form.password.errors %}
+        <div class="alert alert-danger" role="alert">{{ form.password.errors[0] }}</div>
+        {% endif %}
+
+        <div class="form-check">
+            {{ form.remember_me(class="form-check-input", type="checkbox", value="", id="rememberMeCheck") }}
+            {{ form.remember_me.label(class="form-check-label", for="rememberMeCheck") }}
+        </div>
+
+        {{ form.submit(class="btn btn-outline-dark") }}
     </form>
+    <a href="/register">Еще не зарегистрированы?</a>
 </div>
 {% endblock %}

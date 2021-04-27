@@ -86,7 +86,7 @@ def login():
         # если пользователь ввёл неправильный логин или пароль, возвращаем шаблон и сообщаем ему об этом
         return render_template('login_form.html', message="Неправильный логин или пароль", form=form)
     # возвращаем шаблон с заголовком и формой, если пользователь её не заполнил
-    return render_template('login_form.html', title='Авторизация', form=form)
+    return render_template('login_form.html', form=form)
 
 
 # Выход из учетной записи
@@ -109,14 +109,14 @@ def reqister():
         # сверяем пароли
         if form.password.data != form.password_again.data:
             # если пользователь ввёл несовпадающие пароли, возвращаем шаблон и сообщаем ему об этом
-            return render_template('register_form.html', title='Регистрация', form=form,
+            return render_template('register_form.html', form=form,
                                    message="Пароли не совпадают")
         # создаем сессию с базой данных
         db_sess = db_session.create_session()
         # проверяем, есть ли уже в базе данных пользователь с введенной почтой
         if db_sess.query(User).filter(User.email == form.email.data).first():
             # если да, возвращаем шаблон и сообщаем ему об этом
-            return render_template('register_form.html', title='Регистрация', form=form,
+            return render_template('register_form.html', form=form,
                                    message="Такой пользователь уже есть")
         # создаем новую запись
         user = User(
@@ -133,7 +133,7 @@ def reqister():
         # перенаправляем на галерею
         return redirect('/')
     # возвращаем шаблон с заголовком и формой, если пользователь её не заполнил
-    return render_template('register_form.html', title='Регистрация', form=form)
+    return render_template('register_form.html', form=form)
 
 
 """Профиль пользователя"""
@@ -307,8 +307,9 @@ def stats():
     if not current_user.is_authenticated:
         return redirect('/login')
 
-    score_num = current_user.get_score_num()
+    score_num = current_user.get_score_num()  # счёт для шкалы уровня
 
+    # значения для шкалы предпочтения сложности
     easy, medium, hard = map(int, current_user.score.split(';'))
     total = easy + medium + hard
 
