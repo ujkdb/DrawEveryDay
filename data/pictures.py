@@ -16,6 +16,8 @@ class Picture(SqlAlchemyBase):
     owner_id = sqlalchemy.Column(sqlalchemy.Integer,
                                  sqlalchemy.ForeignKey("users.id"))
 
+    deleted = sqlalchemy.Column(sqlalchemy.Boolean)
+
     user = orm.relation('User')
 
     task = orm.relation('Task')

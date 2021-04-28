@@ -53,14 +53,21 @@ def discover_image(picture_name):
     # создаем сессию с базой данных
     db_sess = db_session.create_session()
     # получаем название рисунка
-    picture = db_sess.query(Picture).filter(Picture.name == picture_name).first()
+    picture = db_sess.query(Picture).filter(Picture.name == picture_name).filter(Picture.deleted == 0).first()
+
+    if not picture:  # если изображения не существует
+        return redirect('/')
+
+    your_image = current_user.is_authenticated and current_user.id == picture.owner_id
+
     # получаем id автора
     user = db_sess.query(User).filter(User.id == picture.owner_id).first()
     # получаем id задания
     task = db_sess.query(Task).filter(Task.id == picture.task_id).first()
     # возвращаем шаблон с изображением, именем автора, заданием, именем рисунка, сложностью задания и id пользователя
     return render_template('discover_image.html', username=user.name, task=task.name.capitalize(),
-                           picture_name=picture_name, task_difficulty=task.difficulty, user_id=user.id)
+                           picture_name=picture_name, task_difficulty=task.difficulty, user_id=user.id,
+                           your_image=your_image, picture_id=picture.id)
 
 
 """Авторизация, регистрация и выход из учетной записи"""
@@ -160,7 +167,7 @@ def show_user(user_id):
                            your_account=your_account)
 
 
-"""Загрузка рисунков по заданиям"""
+"""Загрузка и удаление рисунков по заданиям"""
 
 
 @app.route('/draw_task/', methods=['GET', 'POST'])
@@ -191,22 +198,36 @@ def draw_task():
         # создаем сессию с базой данных
         db_sess = db_session.create_session()
         # проверяем, отправлял ли пользователь это задание в прошлом
-        if db_sess.query(Picture).filter(Picture.task_id == task.id).first():
+        if db_sess.query(Picture).filter(Picture.task_id == task.id).\
+                filter(Picture.owner_id == current_user.id).\
+                filter(Picture.deleted == 0).first():
             # если да, возвращаем шаблон и сообщаем ему об этом
             return render_template('draw_task.html', form=form, difficulty=difficulty,
                                    image_cap=task.image,
                                    caption=task.name,
                                    fact=task.description,
                                    error_message="Вы уже отправляли это задание")
-        # создаем новую запись
-        picture = Picture(
-            name=filename,
-            owner_id=current_user.id,
-            task_id=task.id
-        )
-        # добавляем ее и сохраняем
-        db_sess.add(picture)
-        db_sess.commit()
+
+        picture = db_sess.query(Picture).filter(  # если запись об изображении есть в удалённом виде
+            Picture.task_id == task.id).filter(Picture.owner_id == current_user.id).first()
+
+        if picture:
+            picture.name = filename
+            picture.deleted = False
+        else:
+            # создаем новую запись
+            picture = Picture(
+                name=filename,
+                owner_id=current_user.id,
+                task_id=task.id
+            )
+            # добавляем ее и сохраняем
+            db_sess.add(picture)
+
+            current_user.add_picture_points(task.difficulty)
+            db_sess.merge(current_user)
+
+            db_sess.commit()
 
         # делим файл на название и формат
         split_filename = os.path.splitext(picture.name)
@@ -232,6 +253,24 @@ def draw_task():
                            image_cap=task.image,
                            caption=task.name,
                            fact=task.description)
+
+
+@app.route('/delete_image/<int:image_id>')
+def delete_image(image_id):
+    if not current_user.is_authenticated:
+        return redirect('/login')
+
+    db_sess = db_session.create_session()
+    picture = db_sess.query(Picture).filter(Picture.id == image_id).first()
+
+    if current_user.id == picture.owner_id:
+        os.remove(os.path.join(os.getcwd(), picture.name))  # удаляем изображение
+        picture.deleted = True  # определяем изображение, как удалённое
+
+        db_sess.merge(picture)
+        db_sess.commit()
+
+    return redirect('/')
 
 
 """Получение отдельного задания (для разработчиков)"""

@@ -57,3 +57,8 @@ class User(SqlAlchemyBase, UserMixin):
 
     def get_rank_picture(self):
         return ('', 'person', 'artist', 'knight', 'wizard', 'king')[self.rank]
+
+    def add_picture_points(self, difficulty):
+        score = self.score.split(';')
+        score[difficulty] = str(int(score[difficulty]) + 1)
+        self.score = ';'.join(score)
