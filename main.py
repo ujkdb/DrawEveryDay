@@ -1,4 +1,5 @@
 # импорт библиотек
+from waitress import serve
 import sys
 import random
 import os
@@ -442,7 +443,7 @@ def main():
     os.chdir(os.getcwd() + '/static/users_pictures')  # смена директории для галереи
 
     # запускаем приложение
-    app.run()
+    serve(app, host="0.0.0.0", port=5000)
 
 
 if __name__ == '__main__':
